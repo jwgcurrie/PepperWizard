@@ -2,6 +2,10 @@
 
 When Pepper's social state is active, the robot's Background movement and Basic Awareness functionality is enabled.
 
+## Launching SocialState:
+SocialState can be launched with the **S** key, or in JoystickMove the **◯** button.
+
+
 ## Background Movement:
 These are slight movements that the robot makes autonomously. <br> If the robot receives a motion command then background movements are suspended until the motion command is complete. <br> If the robot is standing then *setBreathEnabled* is called.
 
