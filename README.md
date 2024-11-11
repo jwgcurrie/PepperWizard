@@ -18,4 +18,6 @@ Functionality can be accessed by entering predefined hotkeys.
 | F        | Find               | *Find Landmarks* <br> Robot will look for landmarks in its environment, once found the robot will look at the landmark until interrupted by the next PepperWizard command
 | T        | [PepperTalk](https://github.com/jwgcurrie/PepperWizard/blob/main/Documentation/PepperTalk.md)               | *PepperTalk - speech mode* <br> The robot will verbalise the text input of the wizard
 | AT        | [PepperTalk](https://github.com/jwgcurrie/PepperWizard/blob/main/Documentation/PepperTalk.md)               | *PepperTalk - animation mode* <br> The robot will verbalise the text input of the wizard, while gesturing using the context of the wizard's input | |
+| Bat        | BatteryStatus  | Returns battery charge in percent | |
+
 
