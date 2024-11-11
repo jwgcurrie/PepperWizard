@@ -26,18 +26,21 @@ def main(session):
     LED_service = session.service("ALLeds")
     animation_service = session.service("ALAnimationPlayer")
     audio_service = session.service("ALAudioDevice")
+    battery_service = session.service("ALBattery")
 
     InitialiseTablet(tablet_service)
 
 
     print(" --- Pepper Online ---")
+    BatteryStatus(battery_service)
 
     controller = InitialiseController()
+
 
     while 1:
         wizard_command = UserInput(mode = 'Command')
         Launcher(wizard_command, alife, tracker_service, motion_service, posture_service, tts, tts_animated, tablet_service, landmark_service, 
-                     memory_service, awareness_service, face_service, audio_player_service, LED_service, animation_service, audio_service, controller)
+                     memory_service, awareness_service, face_service, audio_player_service, LED_service, animation_service, audio_service, controller, battery_service)
     
     print(" --- Exiting Pepper Wizard --- ")
     return
@@ -45,11 +48,11 @@ def main(session):
 
 
 def Launcher(wizard_command, alife, tracker_service, motion_service, posture_service, tts, tts_animated, tablet_service, landmark_service, 
-                memory_service, awareness_service, face_service, audio_player_service, LED_service, animation_service, audio_service, controller):
+                memory_service, awareness_service, face_service, audio_player_service, LED_service, animation_service, audio_service, controller, battery_service):
 
     if wizard_command == 'B': 
         LaunchBegin(motion_service, alife, tracker_service, awareness_service, face_service)
-    elif wizard_command in ['S', 'S BR', 'S WB', 'S MC']:
+    elif wizard_command in ["S", "S BR", "S WB", "S MC"]:
         LaunchSocialState(alife, tracker_service, awareness_service, face_service, wizard_command)
     elif wizard_command == 'E':
         motion_service.rest()
@@ -61,6 +64,8 @@ def Launcher(wizard_command, alife, tracker_service, motion_service, posture_ser
         PepperTalk(tts, animation_service, animate = False)
     elif wizard_command == 'AT':
         PepperTalk(tts_animated, animation_service, animate = True)
+    elif wizard_command == 'Bat':
+        BatteryStatus(battery_service)
     else:
         print("Command not recognised")
     return
@@ -71,6 +76,10 @@ def UserInput(mode):
     elif mode == 'TTS':
         user_input = raw_input("Pepper: ")
     return user_input
+
+def BatteryStatus(battery_service):
+    battery_charge = battery_service.getBatteryCharge()
+    print("Battery Charge: " + str(battery_charge) + "%")
 
 def LaunchBegin(motion_service, alife, tracker_service, awareness_service, face_service):
     motion_service.wakeUp()
