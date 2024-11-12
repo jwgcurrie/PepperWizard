@@ -8,7 +8,7 @@ import numpy as np
 
 
 def main(session):
-    print(" --- Entering Pepper Wizard --- ")
+    PrintTitle()
 
     alife = session.service("ALAutonomousLife") 
     motion_service = session.service("ALMotion")
@@ -17,7 +17,7 @@ def main(session):
     tts_animated = session.service("ALAnimatedSpeech")
     tracker_service = session.service("ALTracker")
     social_perception = session.service("ALPeoplePerception")
-    tablet_service = session.service("ALTabletService")
+    #tablet_service = session.service("ALTabletService")
     landmark_service = session.service("ALLandMarkDetection")
     memory_service = session.service("ALMemory")
     awareness_service = session.service("ALBasicAwareness")
@@ -28,31 +28,35 @@ def main(session):
     audio_service = session.service("ALAudioDevice")
     battery_service = session.service("ALBattery")
 
-    InitialiseTablet(tablet_service)
-
-
+    #InitialiseTablet(tablet_service)
     print(" --- Pepper Online ---")
     BatteryStatus(battery_service)
-
     controller = InitialiseController()
-
+    print(" --- PepperWizard Ready ---")
 
     while 1:
         wizard_command = UserInput(mode = 'Command')
-        Launcher(wizard_command, alife, tracker_service, motion_service, posture_service, tts, tts_animated, tablet_service, landmark_service, 
+        Launcher(wizard_command, alife, tracker_service, motion_service, posture_service, tts, tts_animated, landmark_service, 
                      memory_service, awareness_service, face_service, audio_player_service, LED_service, animation_service, audio_service, controller, battery_service)
-    
+
     print(" --- Exiting Pepper Wizard --- ")
     return
 
+def PrintTitle():
+    print("__________                                   __      __.__                         .__")
+    print("\______   \ ____ ______ ______   ___________/  \    /  \__|____________ _______  __| /")
+    print(" |     ___// __  \____  \____ \_/ __ \_  __ \   \/\/   /  \___   /\__  \\_  __ \/ __  | ")
+    print(" |    |   \  ___/|  |_> >  |_> >  ___/|  | \/\        /|  |/    /  / __ \|  | \/ /_/ | ")
+    print(" |____|    \___  >   __/|   __/ \___  >__|    \ _/\  / |__/_____ \(____  /__|  \____ | ")
+    print("                 |__|   |__|                       \/           \/     \/           \/ ")
 
 
-def Launcher(wizard_command, alife, tracker_service, motion_service, posture_service, tts, tts_animated, tablet_service, landmark_service, 
+
+def Launcher(wizard_command, alife, tracker_service, motion_service, posture_service, tts, tts_animated, landmark_service, 
                 memory_service, awareness_service, face_service, audio_player_service, LED_service, animation_service, audio_service, controller, battery_service):
-
-    if wizard_command == 'B': 
+    if wizard_command == "B": 
         LaunchBegin(motion_service, alife, tracker_service, awareness_service, face_service)
-    elif wizard_command in ["S", "S BR", "S WB", "S MC"]:
+    elif wizard_command in ['S', 'S BR', 'S WB', 'S MC']:
         LaunchSocialState(alife, tracker_service, awareness_service, face_service, wizard_command)
     elif wizard_command == 'E':
         motion_service.rest()
@@ -82,6 +86,7 @@ def BatteryStatus(battery_service):
     print("Battery Charge: " + str(battery_charge) + "%")
 
 def LaunchBegin(motion_service, alife, tracker_service, awareness_service, face_service):
+    print("LaunchBegin")
     motion_service.wakeUp()
     SocialState(alife, tracker_service, awareness_service, face_service, True)
 
@@ -176,7 +181,7 @@ def InitialiseTablet(tablet_service):
     try:
         tablet_service.turnScreenOn(False)    
         tablet_service.setBrightness(0)
-        print("SUCCESS: InitialiseTablet() - Controller Initialised")
+        print("SUCCESS: InitialiseTablet() - Tablet Initialised")
     except:
         print("ERROR: InitialiseTablet() - Failed ")
 
