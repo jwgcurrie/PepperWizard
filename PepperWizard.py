@@ -17,7 +17,7 @@ def main(session):
     tts_animated = session.service("ALAnimatedSpeech")
     tracker_service = session.service("ALTracker")
     social_perception = session.service("ALPeoplePerception")
-    #tablet_service = session.service("ALTabletService")
+    tablet_service = session.service("ALTabletService")
     landmark_service = session.service("ALLandMarkDetection")
     memory_service = session.service("ALMemory")
     awareness_service = session.service("ALBasicAwareness")
@@ -28,7 +28,7 @@ def main(session):
     audio_service = session.service("ALAudioDevice")
     battery_service = session.service("ALBattery")
 
-    #InitialiseTablet(tablet_service)
+    InitialiseTablet(tablet_service)
     print(" --- Pepper Online ---")
     BatteryStatus(battery_service)
     controller = InitialiseController()
@@ -37,7 +37,7 @@ def main(session):
     while 1:
         wizard_command = UserInput(mode = 'Command')
         Launcher(wizard_command, alife, tracker_service, motion_service, posture_service, tts, tts_animated, landmark_service, 
-                     memory_service, awareness_service, face_service, audio_player_service, LED_service, animation_service, audio_service, controller, battery_service)
+                     memory_service, awareness_service, face_service, audio_player_service, LED_service, animation_service, audio_service, controller, battery_service, social_perception)
 
     print(" --- Exiting Pepper Wizard --- ")
     return
@@ -49,15 +49,16 @@ def PrintTitle():
     print(" |    |   \  ___/|  |_> >  |_> >  ___/|  | \/\        /|  |/    /  / __ \|  | \/ /_/ | ")
     print(" |____|    \___  >   __/|   __/ \___  >__|    \ _/\  / |__/_____ \(____  /__|  \____ | ")
     print("                 |__|   |__|                       \/           \/     \/           \/ ")
-
+    print("---------------------------------------------------------------------------------------")
+    print(" - jwgcurrie")
 
 
 def Launcher(wizard_command, alife, tracker_service, motion_service, posture_service, tts, tts_animated, landmark_service, 
-                memory_service, awareness_service, face_service, audio_player_service, LED_service, animation_service, audio_service, controller, battery_service):
+                memory_service, awareness_service, face_service, audio_player_service, LED_service, animation_service, audio_service, controller, battery_service, social_perception):
     if wizard_command == "B": 
         LaunchBegin(motion_service, alife, tracker_service, awareness_service, face_service)
     elif wizard_command in ['S', 'S BR', 'S WB', 'S MC']:
-        LaunchSocialState(alife, tracker_service, awareness_service, face_service, wizard_command)
+        LaunchSocialState(alife, tracker_service, awareness_service, face_service, wizard_command, social_perception)
     elif wizard_command == 'E':
         motion_service.rest()
     elif wizard_command == 'F':
@@ -70,6 +71,8 @@ def Launcher(wizard_command, alife, tracker_service, motion_service, posture_ser
         PepperTalk(tts_animated, animation_service, animate = True)
     elif wizard_command == 'Bat':
         BatteryStatus(battery_service)
+    elif wizard_command == 'Look':
+        Look(tracker_service)
     else:
         print("Command not recognised")
     return
@@ -79,7 +82,29 @@ def UserInput(mode):
         user_input = raw_input("Enter Command: ")
     elif mode == 'TTS':
         user_input = raw_input("Pepper: ")
+    elif mode == 'Look':
+        user_input = raw_input("Enter Direction: ")
     return user_input
+
+
+def Look(tracker_service):
+    x_robot = 0.5
+    z_robot = 1.21
+    speed = 0.2
+    direction = UserInput(mode = 'Look')
+    if direction == 'L':
+        pos = [x_robot, 0.5, z_robot]
+        tracker_service.lookAt(pos, 2, speed, False)
+    elif direction == 'R':
+        pos = [x_robot, -0.5, z_robot]
+        tracker_service.lookAt(pos, 2, speed, False)
+    elif direction == 'S':
+        pos = [x_robot, 0, z_robot]
+        tracker_service.lookAt(pos, 2, speed, False)
+    elif direction == 'D':
+        pos = [0.1, 0, 0]
+        tracker_service.lookAt(pos, 2, speed, False)
+
 
 def BatteryStatus(battery_service):
     battery_charge = battery_service.getBatteryCharge()
@@ -90,8 +115,16 @@ def LaunchBegin(motion_service, alife, tracker_service, awareness_service, face_
     motion_service.wakeUp()
     SocialState(alife, tracker_service, awareness_service, face_service, True)
 
-def LaunchSocialState(alife, tracker_service, awareness_service, face_service, wizard_command):
-    tracker_service.removeTarget("LandMark")
+def LaunchSocialState(alife, tracker_service, awareness_service, face_service, wizard_command, social_perception):
+    tracker_service.unregisterAllTargets()
+    tracker_service.setTimeOut(2000)
+    awareness_service.setEngagementMode("FullyEngaged")
+
+    social_perception.setMaximumDetectionRange(2.0)
+    social_perception.setTimeBeforePersonDisappears(2)
+    social_perception.setFastModeEnabled(True)
+    social_perception.setMovementDetectionEnabled(True)
+
     SocialState(alife, tracker_service, awareness_service, face_service, True)
     if wizard_command == 'S BR':
         tracking_mode = "BodyRotation"
@@ -104,6 +137,9 @@ def LaunchSocialState(alife, tracker_service, awareness_service, face_service, w
     
     tracker_service.setMode(str(tracking_mode))
     print("Tracking Mode: ") + str(tracker_service.getMode())
+    #tracker_service::stopTracker()
+
+
 
 
 def LaunchJoystickMove(controller, motion_service, audio_service, tracker_service, posture_service, alife, landmark_service, memory_service, awareness_service, face_service):
@@ -170,7 +206,7 @@ def SocialState(alife, tracker_service, awareness_service, face_service, interac
     alife.setAutonomousAbilityEnabled("AutonomousBlinking", True)
     face_service.setTrackingEnabled(interaction_switch)
     awareness_service.setEnabled(interaction_switch)
-
+    
     basic_AwarenessState = awareness_service.isRunning()
 
     print("SocialState Status: " + str(basic_AwarenessState))
