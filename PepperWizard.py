@@ -28,7 +28,7 @@ def main(session):
     audio_service = session.service("ALAudioDevice")
     battery_service = session.service("ALBattery")
 
-    InitialiseTablet(tablet_service)
+    #InitialiseTablet(tablet_service)
     print(" --- Pepper Online ---")
     BatteryStatus(battery_service)
     controller = InitialiseController()
@@ -126,16 +126,10 @@ def LaunchSocialState(alife, tracker_service, awareness_service, face_service, w
     social_perception.setMovementDetectionEnabled(True)
 
     SocialState(alife, tracker_service, awareness_service, face_service, True)
-    if wizard_command == 'S BR':
-        tracking_mode = "BodyRotation"
-    elif wizard_command == 'S WB':
-        tracking_mode = "WholeBody"
-    elif wizard_command == 'S MC':
-        tracking_mode = "MoveContextually"
-    elif wizard_command == 'S':
+    if wizard_command == 'S':
         tracking_mode = "Head"
     
-    tracker_service.setMode(str(tracking_mode))
+    tracker_service.setMode(tracking_mode)
     print("Tracking Mode: ") + str(tracker_service.getMode())
     #tracker_service::stopTracker()
 
